@@ -11,13 +11,13 @@
 # Docs: https://redefine-docs.ohevan.com/basic/info
 info:
   # Site title
-  title: Theme Redefine
+  title: EnlightenVision Optometry
   # Site subtitle
-  subtitle: Redefine Your Hexo Journey.
+  subtitle: Clear Vision, Bright Thinking.
   # Author name
-  author: The Redefine Team
+  author: EVO
   # Site URL
-  url: https://redefine.ohevan.com
+  url: https://enlightenvision.net
 # BASIC INFORMATION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
@@ -25,11 +25,11 @@ info:
 # Docs: https://redefine-docs.ohevan.com/basic/defaults
 defaults:
   # Favicon
-  favicon: /images/redefine-favicon.svg
+  favicon: /images/logo.svg
   # Site logo
-  logo: 
+  logo: /images/logo.svg
   # Site avatar
-  avatar: /images/redefine-avatar.svg
+  avatar: /images/logo.svg
 # IMAGE CONFIGURATION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
@@ -125,8 +125,8 @@ home_banner:
   style: fixed # static or fixed
   # Home banner image
   image: 
-    light: /images/wallhaven-wqery6-light.webp # light mode
-    dark: /images/wallhaven-wqery6-dark.webp # dark mode
+    light: /images/homepic-light.png # light mode
+    dark: /images/homepic-dark.jpg # dark mode
   # Home banner title
   title: Theme Redefine
   # Home banner subtitle
@@ -371,10 +371,10 @@ comment:
       region: # Twikoo region. can be empty
     # Giscus comment system. See https://giscus.app/
     giscus:
-      repo: # Github repository name e.g. EvanNotFound/hexo-theme-redefine
-      repo_id: # Github repository id
-      category: # Github discussion category
-      category_id: # Github discussion category id
+      repo: enlightenvision/web # Github repository name e.g. EvanNotFound/hexo-theme-redefine
+      repo_id: R_kgDOOvfO_A # Github repository id
+      category: General # Github discussion category
+      category_id: DIC_kwDOOvfO_M4CqhQ1 # Github discussion category id
       mapping: pathname # Which value to use as the unique identifier for the page. e.g. pathname, url, title, og:title. DO NOT USE og:title WITH PJAX ENABLED since pjax will not update og:title when the page changes
       strict: 0 # Whether to enable strict mode. e.g. 0, 1
       reactions_enabled: 1 # Whether to enable reactions. e.g. 0, 1
