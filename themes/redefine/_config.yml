@@ -93,8 +93,8 @@ global:
   # Whether to enable open graph
   open_graph:
     enable: true
-    image: /images/redefine-og.webp  # default og:image
-    description: Hexo Theme Redefine, Redefine Your Hexo Journey.
+    image: /images/homepic-dark.png  # default og:image
+    description: EnlightenVision Optometry, Focus on brightening your world.
   # Google Analytics
   google_analytics:
     enable: false # Whether to enable Google Analytics
@@ -128,10 +128,13 @@ home_banner:
     light: /images/homepic-light.png # light mode
     dark: /images/homepic-dark.jpg # dark mode
   # Home banner title
-  title: Theme Redefine
+  title: EnlightenVision Optometry
   # Home banner subtitle
   subtitle:
-    text: [] # subtitle text, array
+    text: # subtitle text, array
+      - "Clear Vision, Bright Thinking."
+      - "Personalized Vision Care."
+      - "Excellence in Eye Health."
     hitokoto:  # 一言配置
       enable: false # Whether to enable hitokoto
       show_author: false # Whether to show author
@@ -170,11 +173,11 @@ home_banner:
     style: default # default, reverse, center
     # Social links
     links:
-      github:  # your GitHub URL
-      instagram: # your Instagram URL
-      zhihu:  # your ZhiHu URL
-      twitter:  # your twitter URL
-      email:  # your email
+      Phone: (562) 821-5025 # your Phone Number
+      Fax: (562) 842-3653 # your Fax Number
+      Email: enlightenvision@hotmail.com # your email
+      Website: https://enlightenvision.net # your Website
+      Address:  9551 1/4 Telegraph Rd, Pico Riveral, CA 90660 # your address
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
