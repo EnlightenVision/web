@@ -168,21 +168,19 @@ home_banner:
   social_links:
     # Whether to enable
     enable: true
-    links:
-      Email: mailto:enlightenvision@hotmail.com
     # Social links style
     style: default # default, reverse, center
     # Social links
     links:
       Phone: (562) 821-5025 # your Phone Number
       Fax: (562) 842-3653 # your Fax Number
-      Email: enlightenvision@hotmail.com # your email
+      Email: mailto:enlightenvision@hotmail.com # your email
       Website: https://enlightenvision.net # your Website
       Address:  9551 1/4 Telegraph Rd, Pico Riveral, CA 90660 # your address
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
-      website:  # your Wechat QRcode image URL
+      weixin:  # your Wechat QRcode image URL
       # ...... # you can add more
   scroll_down:
     enable: true
