@@ -1,67 +1,65 @@
 #!/bin/bash
 
-# =============================
-# Hexo + GitHub + Cloudflare Pages 自动部署脚本 with Telegram 通知
-# MacOS 专用
-# =============================
-
-# 设置变量
-PROJECT_DIR="/Users/zshe/evo"
-PAGE_URL="https://enlightenvision.net"
-BOT_TOKEN="8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI"
-CHAT_ID="413142477"
+# === 配置区 ===
+REPO_PATH="/Users/zshe/evo"
+PAGE_URL="https://evoptometry.pages.dev"  # 你的 Cloudflare Pages 地址
 KEYWORD="EnlightenVision"
-LOG_FILE="$PROJECT_DIR/deploy_$(date '+%Y%m%d_%H%M%S').log"
+BOT_TOKEN="8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI"
+CHAT_ID="7098729602"
+LOG_DIR="$REPO_PATH/deploy_logs"
+NOW=$(date "+%Y%m%d_%H%M%S")
+LOG_FILE="$LOG_DIR/deploy_log_$NOW.txt"
+SCREENSHOT="$LOG_DIR/screenshot_$NOW.png"
 
-echo "🚀 开始 Hexo 自动部署..."
+mkdir -p "$LOG_DIR"
 
-# 切换目录
-cd "$PROJECT_DIR" || exit
+# === 部署步骤 ===
+echo "[部署开始] $(date)" | tee -a "$LOG_FILE"
+cd "$REPO_PATH" || exit
 
-# 清理并生成
-echo "🧹 hexo clean && g..." | tee -a "$LOG_FILE"
-hexo clean && hexo g >> "$LOG_FILE" 2>&1
+hexo clean && hexo g 2>&1 | tee -a "$LOG_FILE"
 
-# Git 操作
-echo "🔧 Git 提交..." | tee -a "$LOG_FILE"
-git add . >> "$LOG_FILE" 2>&1
-git commit -m "🚀 Auto Deploy: $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE" 2>&1
-git push origin main >> "$LOG_FILE" 2>&1
+# Git 推送
+{
+  git add . &&
+  git commit -m "Auto deploy $NOW" &&
+  git push origin main
+} >> "$LOG_FILE" 2>&1
 
-# 等待 Cloudflare 构建完成（延迟几秒以确保刷新）
-echo "⏳ 等待 10 秒钟..." | tee -a "$LOG_FILE"
+# 等待 Cloudflare Pages 构建完成的时间（可视需求增减）
 sleep 10
 
-# 检查关键词是否出现在页面
-echo "🔍 检测部署页面内容..." | tee -a "$LOG_FILE"
-START_TIME=$(date +%s)
-PAGE_CONTENT=$(curl -s "$PAGE_URL")
-END_TIME=$(date +%s)
-LATENCY=$((END_TIME - START_TIME))
+# 打开预览页面
+open "$PAGE_URL"
 
-if echo "$PAGE_CONTENT" | grep -q "$KEYWORD"; then
-    echo "✅ 检测成功，关键词 '$KEYWORD' 出现。" | tee -a "$LOG_FILE"
-    MSG="✅ *部署成功！*
-关键词 *$KEYWORD* 出现在网页中。
+# 截图
+screencapture -T 3 -x "$SCREENSHOT"
 
-🕒 部署时间：$(date '+%Y-%m-%d %H:%M:%S')
-🌍 网址：$PAGE_URL
-⚡️ 页面延迟：${LATENCY} 秒"
-else
-    echo "❌ 检测失败，关键词 '$KEYWORD' 未找到。" | tee -a "$LOG_FILE"
-    MSG="❌ *部署失败！*
-关键词 *$KEYWORD* 未检测到！
-
-🕒 时间：$(date '+%Y-%m-%d %H:%M:%S')
-🌍 页面：$PAGE_URL
-⚠️ 页面延迟：${LATENCY} 秒"
+# 检测页面关键词 & 延迟
+STATUS="失败"
+if curl -s --max-time 10 "$PAGE_URL" | grep -q "$KEYWORD"; then
+  STATUS="成功"
 fi
 
-# Telegram 推送
-echo "📤 发送 Telegram 通知..." | tee -a "$LOG_FILE"
-curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-     -d chat_id="${CHAT_ID}" \
-     -d text="${MSG}" \
-     -d parse_mode="Markdown"
+LATENCY=$(curl -o /dev/null -s -w "%{time_total}" "$PAGE_URL")
 
-echo "📄 日志文件保存到：$LOG_FILE"
+# 第一条消息：简报
+curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" \
+  -d chat_id="$CHAT_ID" \
+  -d text="✅ 部署状态：$STATUS\n🌐 延迟：${LATENCY}s\n🔗 $PAGE_URL" \
+  -d parse_mode="HTML"
+
+# 第二条消息：HTML 报告
+curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendPhoto" \
+  -F chat_id="$CHAT_ID" \
+  -F caption="<b>部署报告</b>\n状态：<b>$STATUS</b>\n延迟：<code>${LATENCY}s</code>\n关键词：<code>$KEYWORD</code>\n时间：<code>$(date)</code>\n链接：<a href=\"$PAGE_URL\">点击查看</a>" \
+  -F photo="@${SCREENSHOT}" \
+  -F parse_mode="HTML"
+
+# 日志统计脚本（生成成功率）
+SUCCESS_COUNT=$(grep -l "部署状态：成功" $LOG_DIR/deploy_log_*.txt | wc -l)
+TOTAL_COUNT=$(ls $LOG_DIR/deploy_log_*.txt | wc -l)
+RATE=$((SUCCESS_COUNT * 100 / TOTAL_COUNT))
+
+# 输出统计信息
+echo "[统计] 总部署次数: $TOTAL_COUNT, 成功: $SUCCESS_COUNT, 成功率: $RATE%" | tee -a "$LOG_FILE"
