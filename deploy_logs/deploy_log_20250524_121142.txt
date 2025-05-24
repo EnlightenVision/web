@@ -1,0 +1,3 @@
+<b>✅ 部署成功</b><br>关键词: <code>EnlightenVision</code><br>延迟: <code> ms</code><br>部署时间: <code>20250524_121142</code><br>成功率: <b>100%</b> (2/2)<br><b>更改内容:</b><pre> M deploy.sh
+ M deploy_logs/deploy_log_20250524_120627.txt</pre><br>🔗 <a href='https://enlightenvision.net'>预览网站</a>
+⚠️ Telegram 消息发送失败，API 响应：{"ok":false,"error_code":400,"description":"Bad Request: can't parse entities: Unsupported start tag \"br\" at byte offset 23"}
