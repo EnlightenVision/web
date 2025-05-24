@@ -133,8 +133,7 @@ home_banner:
   subtitle:
     text: # subtitle text, array
       - "Clear Vision, Bright Thinking."
-      - "Personalized Vision Care."
-      - "Excellence in Eye Health."
+      - "Focus on brightening your world."
     hitokoto:  # 一言配置
       enable: false # Whether to enable hitokoto
       show_author: false # Whether to show author
@@ -168,7 +167,9 @@ home_banner:
   # Home banner social links
   social_links:
     # Whether to enable
-    enable: false
+    enable: true
+    links:
+      Email: mailto:enlightenvision@hotmail.com
     # Social links style
     style: default # default, reverse, center
     # Social links
@@ -181,8 +182,10 @@ home_banner:
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
-      weixin:  # your Wechat QRcode image URL
+      website:  # your Wechat QRcode image URL
       # ...... # you can add more
+  scroll_down:
+    enable: true
 # HOME BANNER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
