@@ -106,3 +106,8 @@ theme: redefine
   # type: git
   # repo: https://github.com/EnlightenVision/web.git
   # branch: gh-pages
+
+search:
+  path: search.xml
+  field: post
+  format: html
