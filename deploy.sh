@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ========== 配置部分 ==========
-PAGE_URL="https://enlightenvision.net"   # 你的 Cloudflare Pages 地址
-KEYWORD="EnlightenVision"                 # 用于检测部署内容的关键词
-CHAT_ID="413142477"                      # Telegram Chat ID
-BOT_TOKEN="8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI"  # Telegram Bot Token
-OPEN_BROWSER=true                          # 是否自动打开浏览器
-SEND_SCREENSHOT=true                       # 是否发送截图
+PAGE_URL="https://enlightenvision.net"   # Cloudflare Pages 地址
+KEYWORD="EnlightenVision"                 # 页面关键词
+CHAT_ID="413142477"                       # Telegram Chat ID
+BOT_TOKEN="8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI"  # Telegram Token
+OPEN_BROWSER=true                          # 是否打开浏览器
+SEND_SCREENSHOT=true                       # 是否截图并发送
 
 # ========== 初始化变量 ==========
 DATE_TAG=$(date "+%Y%m%d_%H%M%S")
@@ -45,6 +45,8 @@ HTML=$(curl -s -m 10 "$PAGE_URL")
 END_TIME=$(date +%s%3N)
 DELAY_MS=$((END_TIME - START_TIME))
 
+MATCH_COUNT=$(echo "$HTML" | grep -o "$KEYWORD" | wc -l)
+
 if [[ "$HTML" == *"$KEYWORD"* ]]; then
   STATUS="✅ 部署成功"
   COLOR="green"
@@ -59,6 +61,7 @@ fi
 if $OPEN_BROWSER; then
   echo "自动打开浏览器预览页面..."
   open -a Safari "$PAGE_URL"
+  sleep 3
 fi
 
 # ========== 保存并统计日志 ==========
@@ -69,15 +72,10 @@ TOTAL_COUNT=$((SUCCESS_COUNT + FAIL_COUNT))
 SUCCESS_RATE=$((SUCCESS_COUNT * 100 / TOTAL_COUNT))
 
 # ========== 生成 HTML 报告 ==========
-HTML_REPORT="<b>${STATUS}</b><br>
-关键词: <code>${KEYWORD}</code><br>
-延迟: <code>${DELAY_MS} ms</code><br>
-部署时间: <code>${DATE_TAG}</code><br>
-成功率: <b>${SUCCESS_RATE}%</b> (${SUCCESS_COUNT}/${TOTAL_COUNT})<br>
-🔗 <a href='${PAGE_URL}'>预览网站</a>"
+HTML_REPORT="<b>${STATUS}</b>%0A关键词: <code>${KEYWORD}</code>%0A关键词出现: <b>${MATCH_COUNT}</b> 次%0A延迟: <code>${DELAY_MS} ms</code>%0A部署时间: <code>${DATE_TAG}</code>%0A成功率: <b>${SUCCESS_RATE}%%</b> (${SUCCESS_COUNT}/${TOTAL_COUNT})%0A🔗 <a href='${PAGE_URL}'>预览网站</a>"
 
 # ========== 发送 Telegram 消息 ==========
-# 文本
+# 文本状态
 curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
   -d chat_id="$CHAT_ID" \
   -d text="${STATUS}：${DELAY_MS}ms" \
@@ -89,7 +87,7 @@ curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
   -d text="$HTML_REPORT" \
   -d parse_mode="HTML"
 
-# 截图（可选）
+# 截图（必须发送）
 if $SEND_SCREENSHOT; then
   SCREENSHOT_PATH="/tmp/page_shot.png"
   echo "截图页面..."
