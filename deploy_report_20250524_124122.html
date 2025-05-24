@@ -1,0 +1,306 @@
+<h1 id="部署报告-20250524_124122">部署报告 20250524_124122</h1>
+<p><strong>状态：</strong> <strong>延迟：</strong> 0ms
+<strong>关键词检测：</strong> EnlightenVision <strong>网址：</strong> <a
+href="https://enlightenvision.net">https://enlightenvision.net</a>
+<strong>成功率：</strong> 100% (3/3)</p>
+<h2 id="本次变更">本次变更</h2>
+<pre><code>On branch main
+Your branch is up to date with &#39;origin/main&#39;.
+
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+    modified:   deploy.sh
+
+Untracked files:
+  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+    deploy_git_changes_20250524_124122.txt
+    deploy_log_20250524_121609.txt
+
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+diff --git a/deploy.sh b/deploy.sh
+index 812b4ad..adbdeda 100755
+--- a/deploy.sh
++++ b/deploy.sh
+@@ -1,148 +1,154 @@
+ #!/bin/bash
+ 
+-# ===================== 配置部分 =====================
+-PAGE_URL=&quot;https://enlightenvision.net&quot;                 # Cloudflare Pages 实际网址
+-KEYWORD=&quot;EnlightenVision&quot;                             # 部署页面应包含的关键词
+-CHAT_ID=&quot;413142477&quot;                                  # Telegram Chat ID
+-BOT_TOKEN=&quot;8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI&quot;  # Telegram 机器人 Token
+-OPEN_BROWSER=true                                      # 是否自动打开 Safari 预览
+-SEND_SCREENSHOT=true                                   # 是否发送页面截图
+-MAX_RETRY=3                                            # 构建失败最大重试次数
+-
+-# ===================== 初始化变量 =====================
++############################################
++#         Cloudflare + Hexo 一键部署脚本
++#   1. 检查 Git 变更，无变更自动跳过
++#   2. Hexo 构建、Git 提交、推送 GitHub
++#   3. 检测页面延迟与关键词判断部署
++#   4. 自动保存日志、生成统计图
++#   5. 自动发送 Telegram 消息（含图表/截图）
++#   6. 构建失败自动重试
++#   7. 打开 Safari 浏览器预览
++############################################
++
++# ========== 配置区域 ==========
++PAGE_URL=&quot;https://enlightenvision.net&quot;   # 你的 Cloudflare Pages 网址
++KEYWORD=&quot;EnlightenVision&quot;                # 部署页面检测关键词
++CHAT_ID=&quot;413142477&quot;                      # Telegram Chat ID
++BOT_TOKEN=&quot;8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI&quot;  # Telegram Bot Token
++OPEN_BROWSER=true                        # 是否自动打开 Safari
++SEND_SCREENSHOT=true                     # 是否发送页面截图
++RETRY=2                                  # 失败自动重试次数
++
++# ========== 初始化变量 ==========
+ DATE_TAG=$(date &quot;+%Y%m%d_%H%M%S&quot;)
+-DEPLOY_DIR=&quot;/Users/zshe/evo&quot;                            # 项目路径（固定为你当前路径）
+-LOG_FILE=&quot;$DEPLOY_DIR/deploy_log_${DATE_TAG}.txt&quot;
+-HISTORY_LOG=&quot;$DEPLOY_DIR/deploy_history.log&quot;
+-
+-cd &quot;$DEPLOY_DIR&quot; || exit 1
++LOG_FILE=&quot;deploy_log_${DATE_TAG}.txt&quot;
++DEPLOY_DIR=&quot;$(pwd)&quot;
++GIT_CHANGE_FILE=&quot;deploy_git_changes_${DATE_TAG}.txt&quot;
++PNG_CHART=&quot;deploy_chart_${DATE_TAG}.png&quot;
+ 
+-# ===================== 检查是否有 Git 改动 =====================
++# ========== 检查是否有变更 ==========
+ echo &quot;检查 Git 状态...&quot;
+-git diff --quiet &amp;&amp; git diff --cached --quiet
+-if [ $? -eq 0 ]; then
+-  echo &quot;[$DATE_TAG] 无文件变动，停止部署。&quot; | tee -a &quot;$HISTORY_LOG&quot;
++if git diff --quiet &amp;&amp; git diff --cached --quiet; then
++  echo &quot;[略过] 没有文件变更，停止部署。&quot;
++  echo &quot;[$DATE_TAG] No changes detected. Skipped.&quot; &gt;&gt; deploy_history.log
+   exit 0
+ fi
+ 
+-# ===================== Hexo 构建（自动重试） =====================
+-RETRY=0
+-while [ $RETRY -lt $MAX_RETRY ]; do
+-  echo &quot;Hexo 构建中... 第 $((RETRY+1)) 次尝试&quot;
+-  hexo clean &amp;&amp; hexo g &amp;&amp; break
+-  RETRY=$((RETRY+1))
+-  echo &quot;构建失败，重试中 ($RETRY/$MAX_RETRY)...&quot;
+-  sleep 2
+-
++# ========== 收集本次 Git 变更 ==========
++git status &gt; &quot;$GIT_CHANGE_FILE&quot;
++git diff &gt;&gt; &quot;$GIT_CHANGE_FILE&quot;
++git diff --cached &gt;&gt; &quot;$GIT_CHANGE_FILE&quot;
++
++# ========== 部署流程(含失败重试) ==========
++TRY=0
++SUCCESS=false
++while [ $TRY -le $RETRY ]; do
++  TRY=$((TRY+1))
++  echo &quot;第 $TRY 次尝试 Hexo 构建...&quot;
++  hexo clean &amp;&amp; hexo g
++  BUILD_SUCCESS=$?
++  if [ $BUILD_SUCCESS -eq 0 ]; then
++    # 构建成功
++    git add .
++    git commit -m &quot;Auto deploy at $DATE_TAG&quot;
++    git push origin main
++    # 检查页面延迟与关键词
++    sleep 4  # 保证 Cloudflare 端有时间同步（可调）
++    START_TIME=$(date +%s%3N)
++    HTML=$(curl -s -m 15 &quot;$PAGE_URL&quot;)
++    END_TIME=$(date +%s%3N)
++    DELAY_MS=$((END_TIME - START_TIME))
++    if [[ &quot;$HTML&quot; == *&quot;$KEYWORD&quot;* ]]; then
++      STATUS=&quot;✅ 部署成功&quot;
++      SUCCESS=true
++      break
++    else
++      STATUS=&quot;❌ 部署失败：找不到关键词&quot;
++    fi
++  else
++    STATUS=&quot;❌ Hexo 构建失败&quot;
++  fi
++  # 构建失败自动重试
++  if [ $TRY -le $RETRY ]; then
++    echo &quot;部署失败，$((10*TRY))秒后重试...&quot;
++    sleep $((10 * TRY))
++  fi
+ done
+ 
+-if [ $RETRY -eq $MAX_RETRY ]; then
+-  echo &quot;❌ 构建失败，已达到最大重试次数。&quot; | tee &quot;$LOG_FILE&quot;
+-  curl -s -X POST &quot;https://api.telegram.org/bot${BOT_TOKEN}/sendMessage&quot; \
+-    -d chat_id=&quot;${CHAT_ID}&quot; \
+-    -d text=&quot;❌ Hexo 构建失败，最大重试已达，请手动检查。&quot;
+-  exit 1
++# ========== 日志记录与统计 ==========
++echo &quot;[$DATE_TAG] $STATUS 延迟 ${DELAY_MS:-0}ms&quot; &gt;&gt; deploy_history.log
++SUCCESS_COUNT=$(grep -c &quot;✅ 部署成功&quot; deploy_history.log)
++FAIL_COUNT=$(grep -c &quot;❌&quot; deploy_history.log)
++TOTAL_COUNT=$((SUCCESS_COUNT + FAIL_COUNT))
++SUCCESS_RATE=0
++if [ $TOTAL_COUNT -ne 0 ]; then
++  SUCCESS_RATE=$((SUCCESS_COUNT * 100 / TOTAL_COUNT))
+ fi
+ 
+-# ===================== Git 提交与推送 =====================
+-CHANGES=$(git status --short)
+-git add .
+-git commit -m &quot;Auto deploy at $DATE_TAG&quot;
+-git push origin main
+-
+-# ===================== 测试部署地址延迟与内容 =====================
+-START_TIME=$(date +%s%3N)
+-HTML=$(curl -s -m 20 &quot;$PAGE_URL&quot;)
+-END_TIME=$(date +%s%3N)
+-DELAY_MS=$((END_TIME - START_TIME))
+-
+-if [[ &quot;$HTML&quot; == *&quot;$KEYWORD&quot;* ]]; then
+-  STATUS=&quot;✅ 部署成功&quot;
+-  COLOR=&quot;green&quot;
+-else
+-  STATUS=&quot;❌ 部署失败：关键词未发现&quot;
+-  COLOR=&quot;red&quot;
+-fi
++# ========== 生成本地 HTML/Markdown 简易报告 ==========
++REPORT_MD=&quot;deploy_report_${DATE_TAG}.md&quot;
++REPORT_HTML=&quot;deploy_report_${DATE_TAG}.html&quot;
++echo -e &quot;# 部署报告 ${DATE_TAG}
+
+**状态：** $STATUS
+**延迟：** ${DELAY_MS:-0}ms
+**关键词检测：** $KEYWORD
+**网址：** [$PAGE_URL]($PAGE_URL)
+**成功率：** $SUCCESS_RATE% ($SUCCESS_COUNT/$TOTAL_COUNT)
+
+## 本次变更
+\`\`\`
+$(cat $GIT_CHANGE_FILE)
+\`\`\`&quot; &gt; &quot;$REPORT_MD&quot;
++pandoc &quot;$REPORT_MD&quot; -o &quot;$REPORT_HTML&quot; --from markdown --to html
++
++# ========== 生成统计图表（延迟/成功率）==========
++python3 &lt;&lt; EOF
++import matplotlib.pyplot as plt, re
++log_path = &quot;deploy_history.log&quot;
++delays = []
++statuses = []
++with open(log_path) as f:
++    for line in f:
++        m = re.search(r&#39;(\d+)ms&#39;, line)
++        if m: delays.append(int(m.group(1)))
++        statuses.append(&quot;成功&quot; if &quot;✅&quot; in line else &quot;失败&quot;)
++fig, ax = plt.subplots()
++ax.plot(delays, marker=&#39;o&#39;, label=&#39;延迟(ms)&#39;)
++ax.set_xlabel(&quot;部署次数&quot;)
++ax.set_ylabel(&quot;延迟(ms)&quot;)
++ax2 = ax.twinx()
++ax2.plot([i for i,s in enumerate(statuses) if s==&quot;成功&quot;], [delays[i] for i,s in enumerate(statuses) if s==&quot;成功&quot;], &#39;g.&#39;, label=&#39;成功&#39;, alpha=0.5)
++ax2.plot([i for i,s in enumerate(statuses) if s==&quot;失败&quot;], [delays[i] for i,s in enumerate(statuses) if s==&quot;失败&quot;], &#39;r.&#39;, label=&#39;失败&#39;, alpha=0.5)
++plt.title(&quot;部署延迟 &amp; 成功分布&quot;)
++plt.savefig(&quot;$PNG_CHART&quot;)
++EOF
+ 
+-# ===================== 自动打开浏览器 =====================
++# ========== 自动打开浏览器 ==========
+ if $OPEN_BROWSER; then
+-  echo &quot;打开 Safari 预览...&quot;
+   open -a Safari &quot;$PAGE_URL&quot;
+ fi
+ 
+-# ===================== 保存历史日志 =====================
+-echo &quot;[$DATE_TAG] $STATUS 延迟 ${DELAY_MS}ms&quot; | tee &quot;$LOG_FILE&quot; &gt;&gt; &quot;$HISTORY_LOG&quot;
+-SUCCESS_COUNT=$(grep -c &quot;✅ 部署成功&quot; &quot;$HISTORY_LOG&quot;)
+-FAIL_COUNT=$(grep -c &quot;❌&quot; &quot;$HISTORY_LOG&quot;)
+-TOTAL_COUNT=$((SUCCESS_COUNT + FAIL_COUNT))
+-if [ $TOTAL_COUNT -gt 0 ]; then
+-  SUCCESS_RATE=$((SUCCESS_COUNT * 100 / TOTAL_COUNT))
+-else
+-  SUCCESS_RATE=0
+-fi
+-
+-# ===================== 生成部署报告 HTML =====================
++# ========== Telegram HTML 报告 ==========
+ HTML_REPORT=&quot;&lt;b&gt;${STATUS}&lt;/b&gt;&lt;br&gt;
+ 关键词: &lt;code&gt;${KEYWORD}&lt;/code&gt;&lt;br&gt;
+-延迟: &lt;code&gt;${DELAY_MS} ms&lt;/code&gt;&lt;br&gt;
++延迟: &lt;code&gt;${DELAY_MS:-0} ms&lt;/code&gt;&lt;br&gt;
+ 部署时间: &lt;code&gt;${DATE_TAG}&lt;/code&gt;&lt;br&gt;
+ 成功率: &lt;b&gt;${SUCCESS_RATE}%&lt;/b&gt; (${SUCCESS_COUNT}/${TOTAL_COUNT})&lt;br&gt;
+-🔗 &lt;a href=&#39;${PAGE_URL}&#39;&gt;点我预览&lt;/a&gt;&lt;br&gt;
+-📄 &lt;pre&gt;${CHANGES}&lt;/pre&gt;&quot;
++🔗 &lt;a href=&#39;${PAGE_URL}&#39;&gt;预览网站&lt;/a&gt;&lt;br&gt;
++&lt;pre&gt;变更:
+$(tail -20 $GIT_CHANGE_FILE | sed &#39;s/&lt;/\&amp;lt;/g; s/&gt;/\&amp;gt;/g;&#39;)&lt;/pre&gt;&quot;
+ 
+-# ===================== 推送 Telegram 报告 =====================
+ curl -s -X POST &quot;https://api.telegram.org/bot${BOT_TOKEN}/sendMessage&quot; \
+-  -d chat_id=&quot;${CHAT_ID}&quot; \
++  -d chat_id=&quot;$CHAT_ID&quot; \
+   -d text=&quot;$HTML_REPORT&quot; \
+   -d parse_mode=&quot;HTML&quot;
+ 
+-# ===================== 页面截图（完整） =====================
++# ========== Telegram 统计图表 ==========
++curl -s -X POST &quot;https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto&quot; \
++  -F chat_id=&quot;$CHAT_ID&quot; \
++  -F photo=@&quot;$PNG_CHART&quot; \
++  -F caption=&quot;📈 部署延迟和成功率统计&quot;
++
++# ========== 页面截图（Safari 页面加载动画延迟）==========
+ if $SEND_SCREENSHOT; then
+-  echo &quot;准备截图...&quot;
+-  sleep 3
+   SCREENSHOT_PATH=&quot;/tmp/page_shot_${DATE_TAG}.png&quot;
+-  screencapture -x -R0,0,1280,800 &quot;$SCREENSHOT_PATH&quot;
++  sleep 4  # 延迟，确保动画结束
++  screencapture -x -R0,0,1280,900 &quot;$SCREENSHOT_PATH&quot;
+   curl -s -X POST &quot;https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto&quot; \
+-    -F chat_id=&quot;${CHAT_ID}&quot; \
++    -F chat_id=&quot;$CHAT_ID&quot; \
+     -F photo=&quot;@${SCREENSHOT_PATH}&quot; \
+-    -F caption=&quot;📸 页面截图&quot;
++    -F caption=&quot;📸 页面截图 (${DATE_TAG})&quot;
+ fi
+ 
+-# ===================== 生成成功率图表（可选） =====================
+-python3 &lt;&lt;EOF
+-import matplotlib.pyplot as plt
+-import re
+-from datetime import datetime
+-
+-lines = open(&quot;$HISTORY_LOG&quot;).readlines()
+-dates, statuses, delays = [], [], []
+-for line in lines:
+-    m = re.match(r&quot;\[(.*?)\] (.*?) 延迟 (\d+)ms&quot;, line)
+-    if m:
+-        dt = datetime.strptime(m[1], &quot;%Y%m%d_%H%M%S&quot;)
+-        dates.append(dt)
+-        statuses.append(&quot;成功&quot; if &quot;✅&quot; in m[2] else &quot;失败&quot;)
+-        delays.append(int(m[3]))
+-
+-plt.figure(figsize=(10, 4))
+-colors = [&quot;green&quot; if s == &quot;成功&quot; else &quot;red&quot; for s in statuses]
+-plt.bar(dates, delays, color=colors)
+-plt.xticks(rotation=45)
+-plt.title(&quot;部署延迟趋势图&quot;)
+-plt.ylabel(&quot;延迟 (ms)&quot;)
+-plt.tight_layout()
+-chart_path = &quot;$DEPLOY_DIR/deploy_chart_${DATE_TAG}.png&quot;
+-plt.savefig(chart_path)
+-
+-# 推送图表到 Telegram
+-import requests
+-requests.post(
+-    f&quot;https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto&quot;,
+-    data={&quot;chat_id&quot;: &quot;$CHAT_ID&quot;},
+-    files={&quot;photo&quot;: open(chart_path, &quot;rb&quot;)}
+-)
+-EOF
+-
+-# ===================== 结束 =====================
+ echo &quot;部署完成 ✅&quot;
+ exit 0
+\ No newline at end of file</code></pre>
