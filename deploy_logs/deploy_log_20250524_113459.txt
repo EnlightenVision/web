@@ -241,3 +241,24 @@ INFO  Generated: images/homepic-light.png
 INFO  Generated: images/logo.png
 INFO  Generated: js/libs/mermaid.min.js.map
 INFO  222 files generated in 316 ms
+[main f177ec0] Auto deploy 20250524_113459
+ Committer: zshe <zshe@zshes-MacBook-Air.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 4 files changed, 265 insertions(+), 2 deletions(-)
+ create mode 100644 deploy_logs/deploy_log_20250524_113459.txt
+ create mode 100644 deploy_logs/screenshot_20250524_113318.png
+remote: This repository moved. Please use the new location:        
+remote:   https://github.com/EnlightenVision/web.git        
+To https://github.com/enlightenvision/web.git
+   c9e3049..f177ec0  main -> main
+[统计] 总部署次数:        2, 成功:        0, 成功率: 0%
