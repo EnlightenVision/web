@@ -22,28 +22,30 @@
 @require 'layout/category-content.styl'
 @require 'layout/tag-content.styl'
 
-# Preloader animation
-if (hexo-config('home.sidebar.enable') == true)
+// Preloader animation
+if hexo-config('home.sidebar.enable') == true
   @require 'layout/home-sidebar.styl'
+
   @keyframes fadeBlurInOut
-  0%
-    opacity: 0
-    filter: blur(5px)
-    transform: scale(1.05)
-  30%
-    opacity: 1
-    filter: blur(0)
-    transform: scale(1)
-  70%
-    opacity: 1
-    filter: blur(0)
-    transform: scale(1)
-  100%
-    opacity: 0
-    filter: blur(2px)
-    transform: scale(0.98)
-#preloader .loading-text
-  animation: fadeBlurInOut 3.5s ease forwards
-  font-size: 2.2rem
-  font-weight: 500
-  letter-spacing: 0.05em
+    0%
+      opacity: 0
+      filter: blur(5px)
+      transform: scale(1.05)
+    30%
+      opacity: 1
+      filter: blur(0)
+      transform: scale(1)
+    70%
+      opacity: 1
+      filter: blur(0)
+      transform: scale(1)
+    100%
+      opacity: 0
+      filter: blur(2px)
+      transform: scale(0.98)
+
+  #preloader .loading-text
+    animation: fadeBlurInOut 3.5s ease forwards
+    font-size: 2.2rem
+    font-weight: 500
+    letter-spacing: 0.05em
