@@ -106,13 +106,13 @@ global:
 # Docs: https://redefine-docs.ohevan.com/basic/fontawesome
 fontawesome: # Pro v6.2.1
   # Thin version
-  thin: false
+  thin: true
   # Light version
-  light: false
+  light: true
   # Duotone version
-  duotone: false
+  duotone: true
   # Sharp Solid version
-  sharp_solid: false
+  sharp_solid: true
 # FONTAWESOME <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
