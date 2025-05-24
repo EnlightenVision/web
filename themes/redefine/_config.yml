@@ -11,7 +11,7 @@
 # Docs: https://redefine-docs.ohevan.com/basic/info
 info:
   # Site title
-  title: EnlightenVision Optometry
+  title: EV Optometry
   # Site subtitle
   subtitle: Clear Vision, Bright Thinking.
   # Author name
@@ -170,10 +170,10 @@ home_banner:
     enable: true
     style: default
     links:
-      phone: tel:+15628215025
-      envelope: mailto:enlightenvision@hotmail.com
-      location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
-      globe: https://enlightenvision.net
+      fa-phone: tel:+15628215025
+      fa-envelope: mailto:enlightenvision@hotmail.com
+      fa-location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
+      fa-globe: https://enlightenvision.net
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
@@ -394,7 +394,7 @@ footer:
   # Icon in footer, write fontawesome icon code here
   icon: '<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>'
   # The start time of the website, format: YYYY/MM/DD HH:mm:ss
-  start: 2022/8/17 11:45:14
+  start: 2025/5/15 10:00:00
   # Site statistics
   statistics: true # show site statistics or not (total articles, total words)
   # Footer message
