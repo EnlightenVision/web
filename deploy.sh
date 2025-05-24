@@ -1,101 +1,127 @@
 #!/bin/bash
 
-# ========== 配置部分 ==========
-PAGE_URL="https://enlightenvision.net"   # Cloudflare Pages 地址
-KEYWORD="EnlightenVision"                 # 页面关键词
-CHAT_ID="413142477"                       # Telegram Chat ID
-BOT_TOKEN="8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI"  # Telegram Token
-OPEN_BROWSER=true                          # 是否打开浏览器
-SEND_SCREENSHOT=true                       # 是否截图并发送
+# ========== 配置 ==========
+PAGE_URL="https://enlightenvision.net"
+KEYWORD="EnlightenVision"
+CHAT_ID="413142477"
+BOT_TOKEN="8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI"
+DEPLOY_DIR="/Users/zshe/evo"
+OPEN_BROWSER=true
+SEND_SCREENSHOT=true
 
-# ========== 初始化变量 ==========
+# ========== 初始化 ==========
+cd "$DEPLOY_DIR"
 DATE_TAG=$(date "+%Y%m%d_%H%M%S")
-LOG_FILE="deploy_log_${DATE_TAG}.txt"
-DEPLOY_DIR="$(pwd)"
+LOG_DIR="${DEPLOY_DIR}/deploy_logs"
+LOG_FILE="${LOG_DIR}/deploy_log_${DATE_TAG}.txt"
+SCREENSHOT_FILE="${LOG_DIR}/screenshot_${DATE_TAG}.png"
+mkdir -p "$LOG_DIR"
 
-# ========== 检查是否有改动 ==========
-echo "检查 Git 状态..."
+echo "[部署开始] $(date)" | tee "$LOG_FILE"
+
+# ========== 检查更改 ==========
 if git diff --quiet && git diff --cached --quiet; then
-  echo "[略过] 没有文件变更，停止部署。"
-  echo "[$DATE_TAG] No changes detected. Skipped." >> deploy_history.log
+  echo "[略过] 没有变更。" | tee -a "$LOG_FILE"
+  echo "[$DATE_TAG] No changes detected. Skipped." >> "${LOG_DIR}/deploy_history.log"
   exit 0
 fi
 
 # ========== Hexo 构建 ==========
-echo "开始 Hexo 构建..."
-hexo clean && hexo g
-BUILD_SUCCESS=$?
-
-if [ $BUILD_SUCCESS -ne 0 ]; then
-  echo "❌ 构建失败，退出。" | tee "$LOG_FILE"
+hexo clean && hexo g >> "$LOG_FILE" 2>&1
+if [ $? -ne 0 ]; then
+  MSG="❌ Hexo 构建失败"
+  echo "$MSG" | tee -a "$LOG_FILE"
   curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-    -d chat_id="${CHAT_ID}" \
-    -d text="❌ Hexo 构建失败，请检查日志。"
+    -d chat_id="${CHAT_ID}" -d text="$MSG"
   exit 1
 fi
 
-# ========== Git 提交与推送 ==========
-git add .
-git commit -m "Auto deploy at $DATE_TAG"
-git push origin main
+# ========== Git 提交并记录更动 ==========
+CHANGES=$(git status --short)
+git add . && git commit -m "Auto deploy ${DATE_TAG}" && git push origin main >> "$LOG_FILE" 2>&1
 
-# ========== 测试部署地址延迟与内容 ==========
+# ========== 延迟测试 ==========
 START_TIME=$(date +%s%3N)
 HTML=$(curl -s -m 10 "$PAGE_URL")
 END_TIME=$(date +%s%3N)
 DELAY_MS=$((END_TIME - START_TIME))
 
-MATCH_COUNT=$(echo "$HTML" | grep -o "$KEYWORD" | wc -l)
-
+# ========== 状态判定 ==========
 if [[ "$HTML" == *"$KEYWORD"* ]]; then
   STATUS="✅ 部署成功"
-  COLOR="green"
-  echo "部署成功，延迟 ${DELAY_MS}ms"
 else
-  STATUS="❌ 部署失败：找不到关键词"
-  COLOR="red"
-  echo "部署失败，找不到关键词"
+  STATUS="❌ 失败：关键词缺失"
 fi
 
-# ========== 自动打开页面 ==========
-if $OPEN_BROWSER; then
-  echo "自动打开浏览器预览页面..."
-  open -a Safari "$PAGE_URL"
-  sleep 3
-fi
-
-# ========== 保存并统计日志 ==========
-echo "[$DATE_TAG] $STATUS 延迟 ${DELAY_MS}ms" >> deploy_history.log
-SUCCESS_COUNT=$(grep -c "✅ 部署成功" deploy_history.log)
-FAIL_COUNT=$(grep -c "❌" deploy_history.log)
-TOTAL_COUNT=$((SUCCESS_COUNT + FAIL_COUNT))
-SUCCESS_RATE=$((SUCCESS_COUNT * 100 / TOTAL_COUNT))
-
-# ========== 生成 HTML 报告 ==========
-HTML_REPORT="<b>${STATUS}</b>%0A关键词: <code>${KEYWORD}</code>%0A关键词出现: <b>${MATCH_COUNT}</b> 次%0A延迟: <code>${DELAY_MS} ms</code>%0A部署时间: <code>${DATE_TAG}</code>%0A成功率: <b>${SUCCESS_RATE}%%</b> (${SUCCESS_COUNT}/${TOTAL_COUNT})%0A🔗 <a href='${PAGE_URL}'>预览网站</a>"
-
-# ========== 发送 Telegram 消息 ==========
-# 文本状态
-curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-  -d chat_id="$CHAT_ID" \
-  -d text="${STATUS}：${DELAY_MS}ms" \
-  -d parse_mode="HTML"
-
-# HTML 报告
-curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-  -d chat_id="$CHAT_ID" \
-  -d text="$HTML_REPORT" \
-  -d parse_mode="HTML"
-
-# 截图（必须发送）
+# ========== 截图 Safari ==========
 if $SEND_SCREENSHOT; then
-  SCREENSHOT_PATH="/tmp/page_shot.png"
-  echo "截图页面..."
-  screencapture -x -R0,0,1280,720 "$SCREENSHOT_PATH"
+  echo "截图页面..." >> "$LOG_FILE"
+  osascript <<EOF
+tell application "Safari"
+    open location "$PAGE_URL"
+    delay 3
+    activate
+end tell
+delay 2
+do shell script "screencapture -l$(osascript -e 'tell app \"Safari\" to id of front window') \"$SCREENSHOT_FILE\""
+EOF
+fi
+
+# ========== 打开浏览器 ==========
+$OPEN_BROWSER && open -a Safari "$PAGE_URL"
+
+# ========== 写入日志 ==========
+echo "[$DATE_TAG] $STATUS 延迟 ${DELAY_MS}ms" >> "${LOG_DIR}/deploy_history.log"
+
+# ========== 统计成功率 ==========
+SUCCESS=$(grep -c "✅ 部署成功" "${LOG_DIR}/deploy_history.log")
+FAIL=$(grep -c "❌" "${LOG_DIR}/deploy_history.log")
+TOTAL=$((SUCCESS + FAIL))
+SUCCESS_RATE=$((SUCCESS * 100 / TOTAL))
+
+# ========== 生成图表 ==========
+CHART_PATH="${LOG_DIR}/chart_${DATE_TAG}.png"
+gnuplot <<EOF
+set terminal png size 600,300
+set output "${CHART_PATH}"
+set title "部署成功率"
+set style data histograms
+set style fill solid
+plot "-" using 2:xtic(1) title "次数"
+成功 $SUCCESS
+失败 $FAIL
+EOF
+
+# ========== HTML 报告 ==========
+HTML_REPORT="<b>${STATUS}</b><br>
+关键词: <code>${KEYWORD}</code><br>
+延迟: <code>${DELAY_MS} ms</code><br>
+部署时间: <code>${DATE_TAG}</code><br>
+成功率: <b>${SUCCESS_RATE}%</b> (${SUCCESS}/${TOTAL})<br>
+更改摘要:<pre>${CHANGES}</pre>
+🔗 <a href='${PAGE_URL}'>预览网站</a>"
+
+# ========== 推送 Telegram ==========
+# 报告
+curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+  -d chat_id="${CHAT_ID}" \
+  -d parse_mode="HTML" \
+  --data-urlencode "text=${HTML_REPORT}"
+
+# 截图
+if $SEND_SCREENSHOT && [ -f "$SCREENSHOT_FILE" ]; then
   curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto" \
-    -F chat_id="$CHAT_ID" \
-    -F photo="@${SCREENSHOT_PATH}" \
+    -F chat_id="${CHAT_ID}" \
+    -F photo=@"${SCREENSHOT_FILE}" \
     -F caption="📸 页面截图"
+fi
+
+# 成功率图表
+if [ -f "$CHART_PATH" ]; then
+  curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto" \
+    -F chat_id="${CHAT_ID}" \
+    -F photo=@"${CHART_PATH}" \
+    -F caption="📊 部署统计图"
 fi
 
 echo "部署完成 ✅"
