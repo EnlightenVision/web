@@ -170,10 +170,10 @@ home_banner:
     enable: true
     style: default
     links:
-      fa-phone: tel:+15628215025
-      fa-envelope: mailto:enlightenvision@hotmail.com
-      fa-location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
-      fa-globe: https://enlightenvision.net
+      phone: tel:+15628215025
+      envelope: mailto:enlightenvision@hotmail.com
+      location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
+      globe: https://enlightenvision.net
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
