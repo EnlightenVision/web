@@ -3,11 +3,11 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: EnlightenVision Optometry
 subtitle: ''
 description: ''
 keywords:
-author: John Doe
+author: EVO
 language: en
 timezone: ''
 
@@ -111,3 +111,10 @@ search:
   path: search.xml
   field: post
   format: html
+
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  hub:
+  content: true

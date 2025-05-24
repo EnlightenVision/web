@@ -173,11 +173,11 @@ home_banner:
       fa-phone: tel:+15628215025
       fa-envelope: mailto:enlightenvision@hotmail.com
       fa-location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
-      fa-globe: https://enlightenvision.net
+      fa-rss: /atom.xml
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
-      weixin:  # your Wechat QRcode image URL
+      web:  # your Web QRcode image URL
       # ...... # you can add more
   scroll_down:
     enable: true
@@ -405,7 +405,7 @@ footer:
   # The start time of the website, format: YYYY/MM/DD HH:mm:ss
   start: 2025/5/15 10:00:00
   # Site statistics
-  statistics: true # show site statistics or not (total articles, total words)
+  statistics: false # show site statistics or not (total articles, total words)
   # Footer message
   customize: "© 2025 EnlightenVision Optometry. All rights reserved."
   powered: false   # ← 添加这一行来关闭 Powered by
@@ -421,22 +421,46 @@ footer:
 # INJECT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> start
 # Docs: https://redefine-docs.ohevan.com/inject
 inject:
-  # Whether to enable inject
   enable: true
-  # Inject custom head html code
-  head: 
+  head:
     - '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">'
-    -
-  # Inject custom footer html code
+    - |
+      <style>
+        .custom-footer {
+          backdrop-filter: blur(8px);
+          background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(240,240,240,0.8));
+          border-top: 1px solid rgba(0,0,0,0.1);
+          padding: 1.2rem 0;
+          text-align: center;
+          font-size: 14px;
+          color: #333;
+        }
+        .custom-footer a {
+          margin: 0 12px;
+          color: #666;
+          text-decoration: none;
+          transition: transform 0.3s ease, color 0.3s ease;
+        }
+        .custom-footer a:hover {
+          color: #A31F34;
+          transform: scale(1.2);
+        }
+        .custom-footer i {
+          animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+      </style>
   footer:
     - |
-      <div style="text-align: center; padding: 1rem;">
-        <a href="tel:+15628215025" style="margin: 0 10px; color: #555;"><i class="fa-solid fa-phone"></i></a>
-        <a href="mailto:enlightenvision@hotmail.com" style="margin: 0 10px; color: #555;"><i class="fa-solid fa-envelope"></i></a>
-        <a href="https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660" target="_blank" style="margin: 0 10px; color: #555;"><i class="fa-solid fa-location-dot"></i></a>
-        <a href="https://enlightenvision.net" target="_blank" style="margin: 0 10px; color: #555;"><i class="fa-solid fa-globe"></i></a>
-      </div>
-    -
+     <div class="custom-footer">
+       <a href="tel:+15628215025"><i class="fa-solid fa-phone"></i></a>
+       <a href="mailto:enlightenvision@hotmail.com"><i class="fa-solid fa-envelope"></i></a>
+       <a href="https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660" target="_blank"><i class="fa-solid fa-location-dot"></i></a>
+       <a href="/atom.xml" target="_blank"><i class="fa-solid fa-rss"></i></a>
+     </div>
 # INJECT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
@@ -445,7 +469,7 @@ inject:
 plugins:
   # RSS feed. Requires hexo-generator-feed (npm i hexo-generator-feed). See https://github.com/hexojs/hexo-generator-feed
   feed:
-    enable: false # Whether to enable
+    enable: true # Whether to enable
   # Aplayer. See https://github.com/DIYgod/APlayer
   aplayer:
     enable: false # Whether to enable
