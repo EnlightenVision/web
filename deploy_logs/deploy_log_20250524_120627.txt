@@ -241,3 +241,8 @@ INFO  Generated: images/homepic-light.png
 INFO  Generated: images/logo.png
 INFO  Generated: js/libs/mermaid.min.js.map
 INFO  222 files generated in 325 ms
+remote: This repository moved. Please use the new location:        
+remote:   https://github.com/EnlightenVision/web.git        
+To https://github.com/enlightenvision/web.git
+   084cf92..06d02d3  main -> main
+截图页面...
