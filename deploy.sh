@@ -2,10 +2,10 @@
 
 # === 配置区 ===
 REPO_PATH="/Users/zshe/evo"
-PAGE_URL="https://evoptometry.pages.dev"  # 你的 Cloudflare Pages 地址
+PAGE_URL="https://enlightenvision.net"  # 你的 Cloudflare Pages 地址
 KEYWORD="EnlightenVision"
 BOT_TOKEN="8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI"
-CHAT_ID="7098729602"
+CHAT_ID="413142477"
 LOG_DIR="$REPO_PATH/deploy_logs"
 NOW=$(date "+%Y%m%d_%H%M%S")
 LOG_FILE="$LOG_DIR/deploy_log_$NOW.txt"
