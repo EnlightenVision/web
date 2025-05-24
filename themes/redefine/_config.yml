@@ -146,8 +146,8 @@ home_banner:
     smart_backspace: true # Whether to smart backspace
   # Color of home banner text
   text_color: 
-    light: "#000000" # light mode
-    dark: "#d1d1b6" # dark mode
+    light: "#000000"
+    dark: "#d1d1b6"
   # Specific style of the text
   text_style: 
     # Title font size
@@ -168,23 +168,12 @@ home_banner:
 
   social_links:
     enable: true
-    style: default # default, reverse, center
+    style: default  # default, reverse, center
     links:
-      Phone:
-        url: tel:5628215025
-        icon: fa-solid fa-phone
-      Fax:
-        url: tel:5628423653
-        icon: fa-solid fa-fax
-      Email:
-        url: mailto:enlightenvision@hotmail.com
-        icon: fa-regular fa-envelope
-      Website:
-        url: https://enlightenvision.net
-        icon: fa-solid fa-globe
-      Address:
-        url: https://www.google.com/maps?q=9551+1/4+Telegraph+Rd,+Pico+Rivera,+CA+90660
-        icon: fa-solid fa-map-location-dot
+      envelope: mailto:enlightenvision@hotmail.com
+      phone: tel:+15628215025
+      location-dot: https://maps.google.com?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
+      globe: https://enlightenvision.net
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
