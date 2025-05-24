@@ -165,18 +165,26 @@ home_banner:
     # URL to font CSS file
     url:
   # Home banner social links
+
   social_links:
-    # Whether to enable
     enable: true
-    # Social links style
     style: default # default, reverse, center
-    # Social links
     links:
-      Phone: (562) 821-5025 # your Phone Number
-      Fax: (562) 842-3653 # your Fax Number
-      Email: mailto:enlightenvision@hotmail.com # your email
-      Website: https://enlightenvision.net # your Website
-      Address:  9551 1/4 Telegraph Rd, Pico Riveral, CA 90660 # your address
+      Phone:
+        url: tel:5628215025
+        icon: fa-solid fa-phone
+      Fax:
+        url: tel:5628423653
+        icon: fa-solid fa-fax
+      Email:
+        url: mailto:enlightenvision@hotmail.com
+        icon: fa-regular fa-envelope
+      Website:
+        url: https://enlightenvision.net
+        icon: fa-solid fa-globe
+      Address:
+        url: https://www.google.com/maps?q=9551+1/4+Telegraph+Rd,+Pico+Rivera,+CA+90660
+        icon: fa-solid fa-map-location-dot
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
