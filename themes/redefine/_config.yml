@@ -88,8 +88,8 @@ global:
   single_page: true
   # Whether to enable Preloader.
   preloader:
-    enable: false
-    custom_message: # Custom message. If empty, the site title will be displayed
+    enable: true
+    custom_message: Welcome to EnlightenVision Optometry # Custom message. If empty, the site title will be displayed
   # Whether to enable open graph
   open_graph:
     enable: true
