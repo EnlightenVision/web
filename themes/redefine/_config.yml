@@ -124,7 +124,7 @@ home_banner:
   # style of home banner
   style: fixed # static or fixed
   # Home banner image
-  image: 
+  image:
     light: /images/homepic-light.png # light mode
     dark: /images/homepic-dark.jpg # dark mode
   # Home banner title
@@ -420,14 +420,20 @@ footer:
 # Docs: https://redefine-docs.ohevan.com/inject
 inject:
   # Whether to enable inject
-  enable: false
+  enable: true
   # Inject custom head html code
   head: 
-    -
+    - '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">'
     -
   # Inject custom footer html code
   footer:
-    -
+    - |
+      <div style="text-align: center; padding: 1rem;">
+        <a href="tel:+15628215025" style="margin: 0 10px; color: #555;"><i class="fa-solid fa-phone"></i></a>
+        <a href="mailto:enlightenvision@hotmail.com" style="margin: 0 10px; color: #555;"><i class="fa-solid fa-envelope"></i></a>
+        <a href="https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660" target="_blank" style="margin: 0 10px; color: #555;"><i class="fa-solid fa-location-dot"></i></a>
+        <a href="https://enlightenvision.net" target="_blank" style="margin: 0 10px; color: #555;"><i class="fa-solid fa-globe"></i></a>
+      </div>
     -
 # INJECT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
