@@ -1,35 +1,67 @@
 #!/bin/bash
 
-# 设置你的 Hexo 项目目录
-cd /Users/zshe/evo || exit
+# =============================
+# Hexo + GitHub + Cloudflare Pages 自动部署脚本 with Telegram 通知
+# MacOS 专用
+# =============================
 
-# 记录起始时间
-start_time=$(date +%s)
+# 设置变量
+PROJECT_DIR="/Users/zshe/evo"
+PAGE_URL="https://enlightenvision.net"
+BOT_TOKEN="8106822194:AAF-xkNrMk6iCkVuBXz3FZRJpidgu-MoqPI"
+CHAT_ID="413142477"
+KEYWORD="EnlightenVision"
+LOG_FILE="$PROJECT_DIR/deploy_$(date '+%Y%m%d_%H%M%S').log"
 
-echo "🚀 正在清理并生成 Hexo 静态页面..."
-hexo clean && hexo g
-hexo_status=$?
+echo "🚀 开始 Hexo 自动部署..."
 
-echo "📦 正在提交并推送到 GitHub..."
-git add .
-git commit -m "🚀 Auto Deploy: $(date '+%Y-%m-%d %H:%M:%S')"
-git push origin main
-push_status=$?
+# 切换目录
+cd "$PROJECT_DIR" || exit
 
-# 计算耗时
-end_time=$(date +%s)
-duration=$((end_time - start_time))
+# 清理并生成
+echo "🧹 hexo clean && g..." | tee -a "$LOG_FILE"
+hexo clean && hexo g >> "$LOG_FILE" 2>&1
 
-# macOS 系统通知
-notify() {
-    osascript -e "display notification \"$1\" with title \"🚀 Hexo 部署脚本\""
-}
+# Git 操作
+echo "🔧 Git 提交..." | tee -a "$LOG_FILE"
+git add . >> "$LOG_FILE" 2>&1
+git commit -m "🚀 Auto Deploy: $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE" 2>&1
+git push origin main >> "$LOG_FILE" 2>&1
 
-# 判断结果并发送通知
-if [[ $hexo_status -eq 0 && $push_status -eq 0 ]]; then
-    echo "✅ 部署成功，耗时 ${duration} 秒"
-    notify "✅ 部署成功！耗时 ${duration} 秒，Cloudflare Pages 将自动构建"
+# 等待 Cloudflare 构建完成（延迟几秒以确保刷新）
+echo "⏳ 等待 10 秒钟..." | tee -a "$LOG_FILE"
+sleep 10
+
+# 检查关键词是否出现在页面
+echo "🔍 检测部署页面内容..." | tee -a "$LOG_FILE"
+START_TIME=$(date +%s)
+PAGE_CONTENT=$(curl -s "$PAGE_URL")
+END_TIME=$(date +%s)
+LATENCY=$((END_TIME - START_TIME))
+
+if echo "$PAGE_CONTENT" | grep -q "$KEYWORD"; then
+    echo "✅ 检测成功，关键词 '$KEYWORD' 出现。" | tee -a "$LOG_FILE"
+    MSG="✅ *部署成功！*
+关键词 *$KEYWORD* 出现在网页中。
+
+🕒 部署时间：$(date '+%Y-%m-%d %H:%M:%S')
+🌍 网址：$PAGE_URL
+⚡️ 页面延迟：${LATENCY} 秒"
 else
-    echo "❌ 部署失败，请检查日志，耗时 ${duration} 秒"
-    notify "❌ 部署失败！耗时 ${duration} 秒，请查看终端输出"
+    echo "❌ 检测失败，关键词 '$KEYWORD' 未找到。" | tee -a "$LOG_FILE"
+    MSG="❌ *部署失败！*
+关键词 *$KEYWORD* 未检测到！
+
+🕒 时间：$(date '+%Y-%m-%d %H:%M:%S')
+🌍 页面：$PAGE_URL
+⚠️ 页面延迟：${LATENCY} 秒"
 fi
+
+# Telegram 推送
+echo "📤 发送 Telegram 通知..." | tee -a "$LOG_FILE"
+curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+     -d chat_id="${CHAT_ID}" \
+     -d text="${MSG}" \
+     -d parse_mode="Markdown"
+
+echo "📄 日志文件保存到：$LOG_FILE"
