@@ -138,10 +138,10 @@ home_banner:
       enable: false # Whether to enable hitokoto
       show_author: false # Whether to show author
       api: https://v1.hitokoto.cn # API URL, can add types, see https://developer.hitokoto.cn/sentence/#%E5%8F%A5%E5%AD%90%E7%B1%BB%E5%9E%8B-%E5%8F%82%E6%95%B0
-    typing_speed: 100 # Typing speed (ms)
-    backing_speed: 80 # Backing speed (ms)
-    starting_delay: 500 # Start delay (ms)
-    backing_delay: 1500 # Backing delay (ms)
+    typing_speed: 150 # Typing speed (ms)
+    backing_speed: 100 # Backing speed (ms)
+    starting_delay: 300 # Start delay (ms)
+    backing_delay: 1000 # Backing delay (ms)
     loop: true # Whether to loop
     smart_backspace: true # Whether to smart backspace
   # Color of home banner text
@@ -170,10 +170,18 @@ home_banner:
     enable: true
     style: default
     links:
-      fa-light fa-mobile-button: tel:+15628215025
-      fa-light fa-at: mailto:enlightenvision@hotmail.com
-      fa-light fa-location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
-      fa-light fa-square-rss: /atom.xml
+      fa-light fa-mobile-button:
+        url: tel:+15628215025
+        title: Call
+      fa-light fa-at:
+        url: mailto:enlightenvision@hotmail.com
+        title: Email
+      fa-light fa-location-dot:
+        url: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
+        title: Map
+      fa-light fa-square-rss:
+        url: /atom.xml
+        title: RSS
   # 社交二维码列表
     qrs:
       web:
@@ -203,16 +211,16 @@ navbar:
   links:
     Home: 
       path: / 
-      icon: fa-regular fa-house # can be empty
+      icon: fa-duotone fa-soild fa-house # can be empty
     Services:
       path: /services
-      icon: fa-regular fa-briefcase
+      icon: fa-duotone fa-soild fa-square-ring
     About:
       path: /about
-      icon: fa-regular fa-user
+      icon: fa-duotone fa-soild fa-user
     Contact:
       path: /contact
-      icon: fa-regular fa-envelope
+      icon: fa-duotone fa-soild fa-envelope
     # Archives: 
     #   path: /archives 
     #   icon: fa-regular fa-archive # can be empty
@@ -456,12 +464,146 @@ inject:
       </style>
   footer:
     - |
-     <div class="custom-footer">
-       <a href="tel:+15628215025" target="_blank" title="Call"><i class="fa-duotone fa-light fa-mobile"></i></a>
-       <a href="mailto:enlightenvision@hotmail.com" target="_blank" title="Email"><i class="fa-duotone fa-light fa-at"></i></a>
-       <a href="https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660" target="_blank" title="Map"><i class="fa-duotone fa-light fa-location-dot"></i></a>
-       <a href="/atom.xml" target="_blank" title="RSS"><i class="fa-duotone fa-light fa-square-rss"></i></a>
-     </div>
+      <div class="custom-footer">
+        <a href="tel:+15628215025" target="_blank" title="Call"><i class="fa-duotone fa-light fa-mobile"></i></a>
+        <a href="mailto:enlightenvision@hotmail.com" target="_blank" title="Email"><i class="fa-duotone fa-light fa-at"></i></a>
+        <a href="https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660" target="_blank" title="Map"><i class="fa-duotone fa-light fa-location-dot"></i></a>
+        <a href="/atom.xml" target="_blank" title="RSS"><i class="fa-duotone fa-light fa-square-rss"></i></a>
+      </div>
+    - |
+      <style>
+        .ev-custom-footer {
+          background: linear-gradient(135deg, #23282c 70%, #30363c 100%);
+          color: #f1f3f7;
+          padding: 48px 0 18px 0;
+          font-size: 15px;
+          font-family: 'Segoe UI', Arial, sans-serif;
+          letter-spacing: 0.2px;
+          box-shadow: 0 -4px 24px 0 rgba(45,45,45,0.06);
+        }
+        .ev-footer-container {
+          max-width: 1160px;
+          margin: auto;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 28px;
+        }
+        .ev-footer-col {
+          min-width: 230px;
+          flex: 1 1 300px;
+          margin: 10px 18px;
+          padding: 0 6px;
+          position: relative;
+        }
+        .ev-footer-title {
+          font-size: 17px;
+          font-weight: 600;
+          margin-bottom: 16px;
+          color: #ffda00;
+          letter-spacing: 1px;
+          text-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        .ev-footer-contact,
+        .ev-footer-hours {
+          line-height: 2;
+          color: #e7e7e7;
+          font-size: 15px;
+        }
+        .ev-footer-contact a {
+          color: #6ce3c7;
+          text-decoration: none;
+          transition: color 0.2s;
+          word-break: break-all;
+        }
+        .ev-footer-contact a:hover {
+          color: #ffda00;
+          text-decoration: underline;
+        }
+        .ev-footer-hours {
+          color: #e7e7e7;
+        }
+        .ev-footer-logo {
+          width: 68px;
+          margin-bottom: 14px;
+          opacity: 0.93;
+          filter: drop-shadow(0 2px 16px #15151523);
+          transition: transform 0.3s;
+        }
+        .ev-footer-col a:hover .ev-footer-logo {
+          transform: scale(1.08) rotate(-2deg);
+          filter: drop-shadow(0 2px 22px #5ad6ff80);
+        }
+        .ev-footer-note {
+          color: #a1a1a1;
+          font-size: 12px;
+          margin-top: 18px;
+        }
+        .ev-footer-note a {
+          color: #8cb3ff;
+          text-decoration: none;
+          border-bottom: 1px dotted #6ce3c7;
+          transition: color 0.2s;
+        }
+        .ev-footer-note a:hover {
+          color: #ffda00;
+          border-bottom: 1px solid #ffda00;
+        }
+        .ev-footer-madeby {
+          color: #ffda00;
+          letter-spacing: 0.2px;
+          font-weight: 600;
+          margin-left: 2px;
+        }
+        /* 分隔线 */
+        .ev-footer-divider {
+          height: 1px;
+          background: linear-gradient(to right, #2d2d2d 30%, #58585844, #2d2d2d 70%);
+          margin: 22px 0 0 0;
+          opacity: 0.5;
+          border-radius: 1px;
+        }
+        @media (max-width: 900px) {
+          .ev-footer-container { flex-direction: column; }
+          .ev-footer-col { margin-bottom: 28px; }
+          .ev-footer-logo { margin: 0 auto 16px auto; display: block; }
+        }
+      </style>
+      <div class="ev-custom-footer">
+        <div class="ev-footer-container">
+          <div class="ev-footer-col">
+            <div class="ev-footer-title">Contact Us</div>
+            <div class="ev-footer-contact">
+              <strong>Phone:</strong> <a href="tel:+15628215025">+1 (562) 821-5025</a><br>
+              <strong>Fax:</strong> <a href="tel:+15628423653">+1 (562) 842-3653</a><br>
+              <strong>Email:</strong> <a href="mailto:enlightenvision@hotmail.com">enlightenvision@hotmail.com</a><br>
+              1/4 9551 Telegraph Rd, Pico Rivera, CA 90660
+            </div>
+          </div>
+          <div class="ev-footer-col">
+            <div class="ev-footer-title">Office Hours</div>
+            <div class="ev-footer-hours">
+              Sun: 10:00 am - 5:00 pm<br>
+              Mon: Break<br>
+              Tue: Break<br>
+              Wed: 10:00 am - 5:00 pm<br>
+              Fri: 10:00 am - 5:00 pm<br>
+              Sat: 10:00 am - 5:00 pm
+            </div>
+          </div>
+          <div class="ev-footer-col" style="text-align: center;">
+            <a href="https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660" target="_blank" title="Google Map">
+              <img src="/images/ggmap.svg" class="ev-footer-logo" alt="Navigation">
+            </a>
+            <div class="ev-footer-note">
+              <a href="/privacy-policy">Privacy Policy</a><br>
+              Website by <span class="ev-footer-madeby">EnlightenVision</span>
+            </div>
+          </div>
+        </div>
+        <div class="ev-footer-divider"></div>
+      </div>
 # fa-light fa-mobile: tel:+15628215025
 # fa-light fa-at: mailto:enlightenvision@hotmail.com
 # fa-light fa-location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660

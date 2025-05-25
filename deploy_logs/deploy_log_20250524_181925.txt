@@ -1,0 +1,17 @@
+[20250524_181925] ---- GIT CHANGES BEGIN ----
+ M themes/redefine/_config.yml
+ M themes/redefine/layout/components/header/head.ejs
+ D themes/redefine/source/images/logo.png
+ D themes/redefine/source/images/logo.svg
+?? deploy_logs/
+?? source/css/
+?? source/images/
+?? test.sh
+?? themes/redefine/source/css/custom.css
+?? themes/redefine/source/images/QRCode.png
+?? themes/redefine/source/images/avatar.png
+?? themes/redefine/source/images/avatar.svg
+?? themes/redefine/source/images/logo-dark.png
+?? themes/redefine/source/images/logo-dark.svg
+[20250524_181925] ---- GIT CHANGES END ----
+[20250524_181925] ✅ 部署成功 延迟 287ms
