@@ -1,0 +1,21 @@
+@media (prefers-color-scheme: dark) {
+  /* 覆盖底色与文字 */
+  footer, .footer, #footer {
+    background: #1B181A !important;
+    color: #eee !important;
+    border-top: 1px solid #313136 !important;
+  }
+  /* 覆盖底部图标区 */
+  .footer-social a {
+    background: #232323 !important;
+    color: #aaa !important;
+    border-radius: 6px !important;
+  }
+  /* 强制覆盖图标色！ */
+  .footer-social a i,
+  .footer-social a svg,
+  .footer-social a .fa {
+    color: #aaa !important;
+    fill: #aaa !important;
+  }
+}

@@ -29,7 +29,7 @@ defaults:
   # Site logo
   logo: /images/logo.svg
   # Site avatar
-  avatar: /images/logo.svg
+  avatar: /images/avatar.svg
 # IMAGE CONFIGURATION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
@@ -170,15 +170,16 @@ home_banner:
     enable: true
     style: default
     links:
-      fa-phone: tel:+15628215025
-      fa-envelope: mailto:enlightenvision@hotmail.com
-      fa-location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
-      fa-rss: /atom.xml
-      # ...... # you can add more
-    # Social links with QRcode drawers
+      fa-light fa-mobile-button: tel:+15628215025
+      fa-light fa-at: mailto:enlightenvision@hotmail.com
+      fa-light fa-location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
+      fa-light fa-square-rss: /atom.xml
+  # 社交二维码列表
     qrs:
-      web:  # your Web QRcode image URL
-      # ...... # you can add more
+      web:
+        img: /images/QRCode.png
+        icon: fa-solid fa-qrcode
+        title: Web QRCode
   scroll_down:
     enable: true
 # HOME BANNER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
@@ -407,7 +408,7 @@ footer:
   # Site statistics
   statistics: false # show site statistics or not (total articles, total words)
   # Footer message
-  customize: '© 2025 <i class="fa-solid fa-circle-info fa-beat-fade" style="--fa-beat-fade-opacity: 0.67; --fa-beat-fade-scale: 1.075; color: #f54545"></i> EnlightenVision Optometry. All rights reserved.'
+  customize: '© 2025 EnlightenVision Optometry. All rights reserved. <i class="fa-solid fa-circle-info fa-beat-fade" style="--fa-beat-fade-opacity: 0.67; --fa-beat-fade-scale: 1.075; color: #f54545"></i>'
   powered: false   # ← 添加这一行来关闭 Powered by
   theme: false     # ← 添加这一行来关闭 Theme 信息
   # ICP record number. See https://beian.miit.gov.cn/
@@ -456,11 +457,15 @@ inject:
   footer:
     - |
      <div class="custom-footer">
-       <a href="tel:+15628215025"><i class="fa-solid fa-phone"></i></a>
-       <a href="mailto:enlightenvision@hotmail.com"><i class="fa-solid fa-envelope"></i></a>
-       <a href="https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660" target="_blank"><i class="fa-solid fa-location-dot"></i></a>
-       <a href="/atom.xml" target="_blank"><i class="fa-solid fa-rss"></i></a>
+       <a href="tel:+15628215025" target="_blank" title="Call"><i class="fa-duotone fa-light fa-mobile"></i></a>
+       <a href="mailto:enlightenvision@hotmail.com" target="_blank" title="Email"><i class="fa-duotone fa-light fa-at"></i></a>
+       <a href="https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660" target="_blank" title="Map"><i class="fa-duotone fa-light fa-location-dot"></i></a>
+       <a href="/atom.xml" target="_blank" title="RSS"><i class="fa-duotone fa-light fa-square-rss"></i></a>
      </div>
+# fa-light fa-mobile: tel:+15628215025
+# fa-light fa-at: mailto:enlightenvision@hotmail.com
+# fa-light fa-location-dot: https://maps.google.com/?q=9551+Telegraph+Rd,+Pico+Rivera,+CA+90660
+# fa-light fa-square-rss: /atom.xml
 # INJECT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
